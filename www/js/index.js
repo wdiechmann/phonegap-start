@@ -16,7 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+var bluetoothSerial = cordova.require('bluetoothSerial');
+
 var app = {
+
+	macAddress: "AA:BB:CC:DD:EE:FF",  // get your mac address from bluetoothSerial.list
+	chars: "",
+	
     // Application Constructor
     initialize: function() {
         this.bindEvents();
@@ -44,15 +51,52 @@ var app = {
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
 
-		$('.blue').val('->');
+	    var listPorts = function() {
+	        // list the available BT ports:
+	        bluetoothSerial.list(
+	            function(results) {
+	                app.display(JSON.stringify(results));
+	            },
+	            function(error) {
+	                app.display(JSON.stringify(error));
+	            }
+	        );
+        }
 
-		bluetoothSerial.list(function(devices) {
-		    devices.forEach(function(device) {
-				$('.blue').val( $('.blue').val() + " " + device.address);
-		        // console.log(device.address);
-		    })
-		}, failure);
+        // if isEnabled returns failure, this function is called:
+        var notEnabled = function() {
+            app.display("Bluetooth is not enabled.")
+        }
 
+         // check if Bluetooth is on:
+        bluetoothSerial.isEnabled(
+            listPorts,
+            notEnabled
+        );
+
+			
         console.log('Received Event: ' + id);
     }
+
+	//  appends @error to the message div:
+    showError: function(error) {
+        app.display(error);
+    },
+
+	//  appends @message to the message div:
+    display: function(message) {
+        var display = document.getElementById("message"), // the message div
+            lineBreak = document.createElement("br"),     // a line break
+            label = document.createTextNode(message);     // create the label
+
+        display.appendChild(lineBreak);          // add a line break
+        display.appendChild(label);              // add the message node
+    },
+
+	// clears the message div:
+    clear: function() {
+        var display = document.getElementById("message");
+        display.innerHTML = "";
+    }
+	
 };
