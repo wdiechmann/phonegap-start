@@ -44,6 +44,15 @@ var app = {
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
 
+		$('.blue').val('->');
+
+		bluetoothSerial.list(function(devices) {
+		    devices.forEach(function(device) {
+				$('.blue').val( $('.blue').val() + " " + device.address);
+		        // console.log(device.address);
+		    })
+		}, failure);
+
         console.log('Received Event: ' + id);
     }
 };
